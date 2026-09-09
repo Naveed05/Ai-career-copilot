@@ -1,4 +1,5 @@
 import json
+
 from .config import get_api_key
 
 SYSTEM = "You are a practical career coach. Be specific, honest, concise, and never invent experience, qualifications, or metrics for the candidate."
@@ -13,7 +14,7 @@ def _openai(prompt: str) -> str:
         response_format={"type": "json_object"},
         messages=[{"role": "system", "content": SYSTEM}, {"role": "user", "content": prompt}],
     )
-    return response.choices[0].message.content
+    return response.choices[0].message.content or "{}"
 
 
 def _groq(prompt: str) -> str:
@@ -25,7 +26,7 @@ def _groq(prompt: str) -> str:
         response_format={"type": "json_object"},
         messages=[{"role": "system", "content": SYSTEM}, {"role": "user", "content": prompt}],
     )
-    return response.choices[0].message.content
+    return response.choices[0].message.content or "{}"
 
 
 def _gemini(prompt: str) -> str:
@@ -37,14 +38,17 @@ def _gemini(prompt: str) -> str:
         contents=prompt,
         config=types.GenerateContentConfig(response_mime_type="application/json", temperature=0.2),
     )
-    return response.text
+    return response.text or "{}"
 
 
 def ask_llm(provider: str, prompt: str) -> dict | None:
     if not get_api_key(provider):
         return None
-    raw = {"OpenAI": _openai, "Groq": _groq, "Gemini": _gemini}[provider](prompt)
     try:
+        raw = {"OpenAI": _openai, "Groq": _groq, "Gemini": _gemini}[provider](prompt)
         return json.loads(raw)
-    except json.JSONDecodeError:
+    except (KeyError, TypeError, ValueError, json.JSONDecodeError):
+        return None
+    except Exception:
+        # Provider/network errors should gracefully fall back to deterministic app behavior.
         return None
