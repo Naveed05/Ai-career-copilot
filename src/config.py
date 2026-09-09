@@ -1,6 +1,7 @@
 from pathlib import Path
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -12,8 +13,23 @@ PROVIDERS = {
 
 
 def get_api_key(provider: str) -> str | None:
+    """Read provider credentials from Streamlit Secrets or local environment."""
     key_name = PROVIDERS.get(provider)
-    return os.getenv(key_name) if key_name else None
+    if not key_name:
+        return None
+
+    # Streamlit Community Cloud stores deployment secrets in st.secrets.
+    # Local development can continue using .env / environment variables.
+    try:
+        import streamlit as st
+
+        secret_value = st.secrets.get(key_name)
+        if secret_value:
+            return str(secret_value)
+    except Exception:
+        pass
+
+    return os.getenv(key_name)
 
 
 def ensure_upload_dir() -> Path:
