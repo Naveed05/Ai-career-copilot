@@ -72,26 +72,6 @@ streamlit run app.py
 
 The core matching, retrieval, and fallback features work without an LLM key.
 
-## ☁️ Deploy publicly with Streamlit Community Cloud
-
-The repository is ready for Streamlit Community Cloud deployment.
-
-1. Open `https://share.streamlit.io/` and sign in with GitHub.
-2. Connect GitHub if prompted and authorize access to your repository.
-3. Click **Create app** → **Yup, I have an app**.
-4. Select repository **Naveed05/Ai-career-copilot**.
-5. Select branch **main**.
-6. Set the entrypoint file to **app.py**.
-7. Optionally choose a custom app subdomain.
-8. In **Advanced settings → Secrets**, add the provider key(s) you want to use:
-
-```toml
-OPENAI_API_KEY = "your-key"
-GROQ_API_KEY = "your-key"
-GOOGLE_API_KEY = "your-key"
-```
-
-9. Click **Deploy**.
 
 Do not put real API keys in this GitHub repository. Use Community Cloud's Secrets field for deployment secrets.
 
